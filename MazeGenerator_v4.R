@@ -1,6 +1,6 @@
-#This script works well enough.
-#It just create the maze based on iterations
-#So, it could waste a lot of resources or take a lot of time
+#This script should create a maze flaweslly and quickly.
+#It mus perform better than before by avoiding unnvesesary steps in the creation of the maze
+#So big mazes are created more quickly and they look better.
 
 library(ggplot2)
 library(reshape)
@@ -74,45 +74,51 @@ MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
 }
 
 MazeSize=20
-Runs=100000
-for(i in 1:Runs){
-  
-  if(i==1){
-    #Create Maze
-    Maze=matrix(data=0, nrow=MazeSize, ncol=MazeSize)
+FilledPercent=20
+{
+  OneProportion=0
+  i=0
+  while(OneProportion<FilledPercent){
+    i=i+1
+    if(i==1){
+      #Create Maze
+      Maze=matrix(data=0, nrow=MazeSize, ncol=MazeSize)
+      
+      #Create entrance
+      InCol=rbinom(n=1, size=floor(ncol(Maze)/2), prob=0.6)
+      Maze[1,InCol]=1
+      Maze[2,InCol]=1
+      LastPos=c(2,InCol)
+    }
     
-    #Create entrance
-    Maze[1,ncol(Maze)/2]=1
-    Maze[2,ncol(Maze)/2]=1
-    LastPos=c(2,ncol(Maze)/2)
-  } else if(i==Runs){
-    #Create exit
-    Maze[nrow(Maze),ncol(Maze)/2]=1
-    Maze[nrow(Maze),ncol(Maze)/2]=1
-  }
-  
-  RandomRes=RandomStep(Row=LastPos[1], Col=LastPos[2], DF=Maze)
-  Maze=RandomRes[[1]]
-  LastPos=RandomRes[[2]]
-  
-  #Start again
-  if(i%%500==0){
-    MeltedMaze=melt(Maze)
-    LastRandom=MeltedMaze[sample(x=which(MeltedMaze$value==1), size=1),]
-    LastPos=c(LastRandom$X1, LastRandom$X2)
+    RandomRes=RandomStep(Row=LastPos[1], Col=LastPos[2], DF=Maze)
+    Maze=RandomRes[[1]]
+    LastPos=RandomRes[[2]]
+    
+    #Start again
+    if(i%%100==0){
+      MeltedMaze=melt(Maze)
+      
+      #Check proportion -- it usually never surpasses 50%
+      OneProportion=floor(sum(MeltedMaze$value)*100/nrow(MeltedMaze))
+      if(OneProportion>=FilledPercent){
+        #If stopping early, create exit
+        ExitCol=rbinom(n=1, size=floor(ncol(Maze)/2), prob=0.75)
+        Maze[nrow(Maze),ExitCol]=1
+        Maze[(nrow(Maze)-1),ExitCol]=1
+        
+        print(paste0(FilledPercent,"% proportion reached at iteration ", i))
+      }
+      LastRandom=MeltedMaze[sample(x=which(MeltedMaze$value==1), size=1,
+                                   prob=rep(100/length(which(MeltedMaze$value==1)), length(which(MeltedMaze$value==1)))),]
+      LastPos=c(LastRandom$X1, LastRandom$X2)
+    }
   }
 }
 
 MeltedMaze=melt(Maze)
 MazePlot=ggplot(data=MeltedMaze, aes(x=X2, y=X1, fill=value)) + geom_tile(show.legend=FALSE) +  scale_y_reverse() +
   theme_void() + coord_fixed()
+MazePlot
 
-#dev.new(width=5, height=5, noRStudioGD=TRUE)
-#png(filename="tempMaze.png", width=5, height=5)
-windows()
-print(MazePlot)
-print(MazePlot)
-#image(x=t(Maze), col=c("black","white"), xaxt="n", yaxt="n")
-WaitUser=readLines(con="stdin", 1)
-dev.off()
-print(WaitUser)
+

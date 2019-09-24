@@ -1,3 +1,7 @@
+#This scripts performs really well on multiple size of mazes
+#It has improved performance, but some minor problems are still present
+
+
 library(ggplot2)
 library(reshape)
 

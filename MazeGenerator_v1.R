@@ -1,3 +1,6 @@
+#Basic maze generator
+#This script was a test, trying to get some insights about generating a maze
+#It really didnt work well
 
 library(ggplot2)
 library(reshape)
