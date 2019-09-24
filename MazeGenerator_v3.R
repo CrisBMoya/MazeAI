@@ -69,8 +69,8 @@ MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
   }
 }
 
-MazeSize=25
-FilledPercent=52
+MazeSize=20
+FilledPercent=20
 {
   OneProportion=0
   i=0
@@ -125,3 +125,4 @@ print(MazePlot)
 WaitUser=readLines(con="stdin", 1)
 dev.off()
 print(WaitUser)
+
