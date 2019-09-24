@@ -1,0 +1,9 @@
+if moving south, south must be a 0, and west and east must be 0
+if moving north, north must be a 0, and west and east must be 0
+if moving east, east must be 0, and north and south must be 0
+if moving west, west must be 0, and north and south must be 0
+
+if moving north and north is 1, a move to west or east is allowed
+if moving south and south is 1, a move to west or east is allowed
+if moving west and west is 1, a move to north or south is allowed
+if moving east and east is 1, a move to north or south is allowed
