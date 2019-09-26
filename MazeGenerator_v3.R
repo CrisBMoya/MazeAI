@@ -73,8 +73,8 @@ MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
   }
 }
 
-MazeSize=20
-FilledPercent=20
+MazeSize=100
+FilledPercent=52
 {
   OneProportion=0
   i=0

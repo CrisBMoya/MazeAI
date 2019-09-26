@@ -37,7 +37,7 @@ RandomStep=function(Row, Col, DF, Direction=NULL){
   
   #Step
   StepAndPos=MovingRules(CurrentStep=Step, DF=DF, Row=Row, Col=Col, 
-                         N=NSWE$N, S=NSWE$S, W=NSWE$W, E=NSWE$E)
+    N=NSWE$N, S=NSWE$S, W=NSWE$W, E=NSWE$E)
   
   return(list(StepAndPos[[1]], StepAndPos[[2]]))
 }
@@ -45,19 +45,19 @@ RandomStep=function(Row, Col, DF, Direction=NULL){
 
 MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
   if(CurrentStep=='S' && S+1 <= nrow(DF) && DF[S+1,Col]==0 && DF[S,Col]==0 && 
-     DF[Row+1,W]==0 && DF[Row+1,E]==0){
+      DF[Row+1,W]==0 && DF[Row+1,E]==0){
     DF[S,Col]=1
     return(list(DF, c(S,Col)))
   }else if(CurrentStep=='N' && N-1 > 0 && DF[N,Col]==0 && DF[N-1,Col]==0 && 
-           DF[Row-1,W]==0 && DF[Row-1,E]==0){
+      DF[Row-1,W]==0 && DF[Row-1,E]==0){
     DF[N,Col]=1
     return(list(DF, c(N,Col)))
   }else if(CurrentStep=='E' && E+1 <= ncol(DF) && DF[N,Col+1]==0 && DF[S,Col+1]==0 && 
-           DF[Row,E]==0 && DF[Row,E+1]==0){
+      DF[Row,E]==0 && DF[Row,E+1]==0){
     DF[Row,E]=1
     return(list(DF, c(Row,E))) 
   }else if(CurrentStep=='W' && W-1 > 0 && DF[N,Col-1]==0 && DF[S,Col-1]==0 && 
-           DF[Row,W]==0 && DF[Row,W-1]==0){
+      DF[Row,W]==0 && DF[Row,W-1]==0){
     DF[Row,W]=1
     return(list(DF, c(Row,W))) 
   }else if(CurrentStep=='S' && DF[S,Col]==1){
@@ -73,8 +73,11 @@ MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
   }
 }
 
-MazeSize=20
-FilledPercent=20
+
+
+MazeSize=15
+FilledPercent=45
+CutNumber=3
 {
   OneProportion=0
   i=0
@@ -109,16 +112,35 @@ FilledPercent=20
         
         print(paste0(FilledPercent,"% proportion reached at iteration ", i))
       }
-      LastRandom=MeltedMaze[sample(x=which(MeltedMaze$value==1), size=1,
-                                   prob=rep(100/length(which(MeltedMaze$value==1)), length(which(MeltedMaze$value==1)))),]
-      LastPos=c(LastRandom$X1, LastRandom$X2)
+      LastRandom=MeltedMaze[which(MeltedMaze$value==1),]
+      
+      Balance=as.numeric(as.character(cut(x=rowSums(Maze), breaks=CutNumber, labels=1:CutNumber)))
+      R1=sample(x=which(Balance<ceiling(CutNumber/2)), size=1)
+      
+      if(any((LastRandom$X1)>=R1)){
+        LastRandom=LastRandom[sample(x=which(LastRandom$X1 >= R1), size=1),]
+        LastPos=c(LastRandom$X1, LastRandom$X2)
+      }else{
+        LastRandom=LastRandom[sample(x=nrow(LastRandom), size=1),]
+        LastPos=c(LastRandom$X1, LastRandom$X2)
+      }
     }
   }
 }
-
-MeltedMaze=melt(Maze)
-MazePlot=ggplot(data=MeltedMaze, aes(x=X2, y=X1, fill=value)) + geom_tile(show.legend=FALSE) +  scale_y_reverse() +
-  theme_void() + coord_fixed()
-MazePlot
-
+# 
+# #Default parameters
+# PointsLabel=1
+# 
+# MeltedMaze=melt(Maze)
+# MazePlot=ggplot(data=MeltedMaze, aes(x=X2, y=X1)) + 
+#   geom_raster(aes(fill=as.factor(value)), show.legend=FALSE) +  
+#   scale_fill_manual(values=NameVect)+
+#   scale_y_reverse() +
+#   theme_void() + 
+#   coord_fixed() + 
+#   annotate(geom='text', x=max(MeltedMaze$X2)+2, y=min(MeltedMaze$X1), 
+#     label=paste0('Points: ', PointsLabel),
+#     color='black')
+# MazePlot
+# 
 
