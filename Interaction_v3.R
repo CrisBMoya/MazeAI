@@ -1,15 +1,22 @@
 #This works well enough. It moves and updates a plot
 #There are rules for moving, so you can only move within the plot and never above walls
 
+#Adapting code so it would be able to use it from R directly or through command line
+#Also with the option to show or not the graphical maze.
+#There are optional usefull reporting returns.
+
 library(keypress)
 
 #Create Maze
 setwd(gsub(pattern='Documents', replacement='Google Drive/Github/MazeAI/', x=getwd()))
 source(file='MazeGenerator_v6.R')
 
+#Set Parameters
+SizeOfMaze=20
+PercentFill=50
 
 #Default first user step
-Maze=MazeGen(MazeSize=20, FilledPercent=50, ShuffleNum=100, PercentTolerance=1000, verbose=FALSE)
+Maze=MazeGen(MazeSize=SizeOfMaze, FilledPercent=PercentFill, ShuffleNum=50, PercentTolerance=1000, verbose=FALSE)
 reMaze=Maze
 OriginalLocation=c(1,which(reMaze[1,]==1))
 reMaze[OriginalLocation[1],OriginalLocation[2]]=2
@@ -42,8 +49,8 @@ UpdatePlot=function(MazeDF, Loc, Count, PointsLabel){
     theme_void() + 
     coord_fixed() + 
     annotate(geom='text', x=max(reMelt$X2)+2, y=min(reMelt$X1), 
-      label=paste0('Points: ', PointsLabel),
-      color='black')
+             label=paste0('Points: ', PointsLabel),
+             color='black')
   
   #Show Maze in command line
   if(Count==1){
@@ -54,6 +61,9 @@ UpdatePlot=function(MazeDF, Loc, Count, PointsLabel){
   
   #Check if the user won the game
   WinGame(MazeDF=MazeDF, Loc=Loc)
+  
+  #Check if the user lose the game
+  LoseGame(PointsLabel=PointsLabel, SizeOfMaze=SizeOfMaze, PercentFill=PercentFill)
   
   #Call the other function, who will wait until a key is pressed, so no eternal loop is created ou of control
   UserInput(MazeDF=MazeDF, Loc=Loc, Count=Count, PointsLabel=PointsLabel)
@@ -92,7 +102,7 @@ UserInput=function(MazeDF, Loc, Count, PointsLabel){
     dev.off()
     stopQuietly()
   }else{
-    PointsLabel=PointsLabel+1
+    PointsLabel=PointsLabel-1
     MazeDF[Loc[1],Loc[2]]=2
   }
   
@@ -114,6 +124,18 @@ WinGame=function(MazeDF, Loc){
   } 
 }
 
+#Lose game condition
+LoseGame=function(PointsLabel, SizeOfMaze, PercentFill){
+  LoseCondition=(SizeOfMaze^2)*(PercentFill/100)
+  if(abs(PointsLabel)>=LoseCondition){
+    print('You have taken too much steps! You lose!')
+    print('Press any key to exit game')
+    keypress()
+    dev.off()
+    stopQuietly()
+  }
+}
+
 #Stolen from internet. Apparently by Henrik Bengtsson
 stopQuietly=function(...) {
   blankMsg=sprintf("\r%s\r", paste(rep(" ", getOption("width")-1L), collapse=" "));
@@ -124,4 +146,3 @@ stopQuietly=function(...) {
 Count=0
 PointsLabel=0
 UpdatePlot(MazeDF=reMaze, Loc=OriginalLocation, Count=Count, PointsLabel=PointsLabel)
-
