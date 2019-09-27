@@ -75,9 +75,9 @@ MovingRules=function(CurrentStep, DF, Row, Col, N, S, W, E){
 
 
 
-MazeSize=15
-FilledPercent=45
-CutNumber=3
+MazeSize=25
+FilledPercent=50
+CutNumber=10
 {
   OneProportion=0
   i=0
