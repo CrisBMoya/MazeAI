@@ -1,11 +1,14 @@
 #This works well enough. It moves and updates a plot
 #There are rules for moving, so you can only move within the plot and never above walls
 
-#Adapting code so it would be able to use it from R directly or through command line
+#Adapting code so it would be able to use it from R directly or through command line.
 #Also with the option to show or not the graphical maze.
 #There are optional usefull reporting returns.
 
-library(keypress)
+suppressMessages({
+  library(keypress)
+  library(tidyverse)
+})
 
 #Create Maze
 setwd(gsub(pattern='Documents', replacement='Google Drive/Github/MazeAI/', x=getwd()))
@@ -32,32 +35,36 @@ reMaze[OriginalLocation[1],OriginalLocation[2]]=2
 NameVect=c('black','white','red')
 names(NameVect)=c(0,1,2)
 
-UpdatePlot=function(MazeDF, Loc, Count, PointsLabel){
+UpdatePlot=function(MazeDF, Loc, Count, PointsLabel, Plot, InputType){
   #Count
   Count=1+Count
-  #print(Loc)
   
-  #Save argument as temporal objetc
-  MazeDF=MazeDF
-  
-  #Melt DF and plot
-  reMelt=melt(MazeDF)
-  reMazePlot=ggplot(data=reMelt, aes(x=X2, y=X1)) + 
-    geom_raster(aes(fill=as.factor(value)), show.legend=FALSE) +  
-    scale_fill_manual(values=NameVect)+
-    scale_y_reverse() +
-    theme_void() + 
-    coord_fixed() + 
-    annotate(geom='text', x=max(reMelt$X2)+2, y=min(reMelt$X1), 
-             label=paste0('Points: ', PointsLabel),
-             color='black')
-  
-  #Show Maze in command line
-  if(Count==1){
-    windows()
+  #Plot or not de maze
+  if(Plot==TRUE){
+    #Melt DF and plot
+    reMelt=melt(MazeDF)
+    reMazePlot=ggplot(data=reMelt, aes(x=X2, y=X1)) + 
+      geom_raster(aes(fill=as.factor(value)), show.legend=FALSE) +  
+      scale_fill_manual(values=NameVect)+
+      scale_y_reverse() +
+      theme_void() + 
+      coord_fixed() + 
+      annotate(geom='text', x=max(reMelt$X2)+2, y=min(reMelt$X1), 
+        label=paste0('Points: ', PointsLabel),
+        color='black')
+    
+    
+    #Show Maze in command line
+    if(Count==1){
+      windows()
+    }
+    print(reMazePlot)
+    print(reMazePlot)
   }
-  print(reMazePlot)
-  print(reMazePlot)
+  
+  #Reporting
+  write_lines(x=paste0(PointsLabel,' ', paste0(Loc, collapse=',')), 
+    path='C:/Users/Tobal/Desktop/Reporting.txt', append=TRUE)
   
   #Check if the user won the game
   WinGame(MazeDF=MazeDF, Loc=Loc)
@@ -65,15 +72,19 @@ UpdatePlot=function(MazeDF, Loc, Count, PointsLabel){
   #Check if the user lose the game
   LoseGame(PointsLabel=PointsLabel, SizeOfMaze=SizeOfMaze, PercentFill=PercentFill)
   
-  #Call the other function, who will wait until a key is pressed, so no eternal loop is created ou of control
-  UserInput(MazeDF=MazeDF, Loc=Loc, Count=Count, PointsLabel=PointsLabel)
-  
-} 
+  #Call the other function, who will wait until a key is pressed, so no eternal loop is created out of control
+  UserInput(MazeDF=MazeDF, Loc=Loc, Count=Count, PointsLabel=PointsLabel, Plot=Plot, InputType=InputType)
+}
 
-UserInput=function(MazeDF, Loc, Count, PointsLabel){
+UserInput=function(MazeDF, Loc, Count, PointsLabel, Plot, InputType){
   #Wait for user input. 
   #This allow us to control the flow of the circular dependency between the functions.
-  UserKey=keypress()
+  if(InputType=='Classic'){
+    UserKey=keypress()
+  }else if(InputType=="ReadLines"){
+    TempKey=readLines(con="stdin", n=1)
+    UserKey=KeyReplace(x=TempKey)
+  }
   
   #If series and rules who control where to move
   if(UserKey=='down' && Loc[1]+1<=nrow(MazeDF) && MazeDF[Loc[1]+1,Loc[2]]!=0){
@@ -98,18 +109,21 @@ UserInput=function(MazeDF, Loc, Count, PointsLabel){
     MazeDF[Loc[1],Loc[2]]=2
     
   }else if(UserKey=='escape'){
-    #Close open device to exit safely the game
-    dev.off()
-    stopQuietly()
+    
+    if(Plot==TRUE){
+      #Close open device to exit safely the game
+      dev.off()
+      stopQuietly()
+    }else{
+      stopQuietly()
+    }
   }else{
     PointsLabel=PointsLabel-1
     MazeDF[Loc[1],Loc[2]]=2
   }
   
   #Show plot with new values
-  UpdatePlot(MazeDF=MazeDF, Loc=Loc, Count=Count, PointsLabel=PointsLabel)
-  
-  return(list(UserKey,Loc))
+  UpdatePlot(MazeDF=MazeDF, Loc=Loc, Count=Count, PointsLabel=PointsLabel, Plot=Plot, InputType=InputType)
 }
 
 #Win game condition
@@ -142,7 +156,30 @@ stopQuietly=function(...) {
   stop(simpleError(blankMsg));
 }
 
+#Key replacement for non interactive use
+KeyReplace=function(x){
+  if(x=='w'){
+    x='up'
+    return(x)
+  }else if(x=='s'){
+    x='down'
+    return(x)
+  }else if(x=='a'){
+    x='left'  
+    return(x)
+  }else if(x=='d'){
+    x='right'  
+    return(x)
+  }else if(x=='q'){
+    x='escape'
+    return(x)
+  }
+}
+
 #Start
 Count=0
 PointsLabel=0
-UpdatePlot(MazeDF=reMaze, Loc=OriginalLocation, Count=Count, PointsLabel=PointsLabel)
+PlotOpt=TRUE
+InputType='ReadLines'
+UpdatePlot(MazeDF=reMaze, Loc=OriginalLocation, Count=Count, PointsLabel=PointsLabel, 
+  Plot=PlotOpt, InputType=InputType)
