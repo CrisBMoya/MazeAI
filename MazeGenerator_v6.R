@@ -179,7 +179,11 @@ MazeGen=function(MazeSize, FilledPercent, ShuffleNum, PercentTolerance, verbose=
   }
   return(Maze)
 }
-#Default parameters
+# 
+# # MazePlot
+# Maze=MazeGen(MazeSize=10, FilledPercent=50, ShuffleNum=50, PercentTolerance=1000)
+# 
+# #Default parameters
 # PointsLabel=1
 # 
 # #Default colors
@@ -197,6 +201,3 @@ MazeGen=function(MazeSize, FilledPercent, ShuffleNum, PercentTolerance, verbose=
 #            label=paste0('Points: ', PointsLabel),
 #            color='black')
 # MazePlot
-#Maze=MazeGen(MazeSize=25, FilledPercent=50, CutNumber=10)
-
-

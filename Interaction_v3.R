@@ -15,7 +15,7 @@ setwd(gsub(pattern='Documents', replacement='Google Drive/Github/MazeAI/', x=get
 source(file='MazeGenerator_v6.R')
 
 #Set Parameters
-SizeOfMaze=20
+SizeOfMaze=15
 PercentFill=50
 
 #Default first user step
@@ -179,7 +179,7 @@ KeyReplace=function(x){
 #Start
 Count=0
 PointsLabel=0
-PlotOpt=TRUE
+PlotOpt=FALSE
 InputType='ReadLines'
 UpdatePlot(MazeDF=reMaze, Loc=OriginalLocation, Count=Count, PointsLabel=PointsLabel, 
   Plot=PlotOpt, InputType=InputType)
