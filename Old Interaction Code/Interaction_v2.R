@@ -4,7 +4,6 @@
 library(keypress)
 
 #Create Maze
-setwd(gsub(pattern='Documents', replacement='Google Drive/Github/MazeAI/', x=getwd()))
 source(file='MazeGenerator_v6.R')
 
 #Set Parameters

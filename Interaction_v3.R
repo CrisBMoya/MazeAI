@@ -64,7 +64,7 @@ UpdatePlot=function(MazeDF, Loc, Count, PointsLabel, Plot, InputType){
   
   #Reporting
   write_lines(x=paste0(PointsLabel,' ', paste0(Loc, collapse=',')), 
-    path='C:/Users/Tobal/Desktop/Reporting.txt', append=TRUE)
+    path='Reporting.txt', append=TRUE)
   
   #Check if the user won the game
   WinGame(MazeDF=MazeDF, Loc=Loc)
@@ -179,7 +179,7 @@ KeyReplace=function(x){
 #Start
 Count=0
 PointsLabel=0
-PlotOpt=FALSE
-InputType='ReadLines'
+PlotOpt=TRUE
+InputType='Classic' # It could be 'Classic' or 'ReadLines'
 UpdatePlot(MazeDF=reMaze, Loc=OriginalLocation, Count=Count, PointsLabel=PointsLabel, 
   Plot=PlotOpt, InputType=InputType)

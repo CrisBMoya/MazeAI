@@ -9,10 +9,10 @@
 #are created without exit!
 
 #Times of creation arent well either, sometimes takes up too much time
-
-library(ggplot2)
-library(reshape)
-
+suppressMessages({
+  library(ggplot2)
+  library(reshape)
+})
 #Take a random step
 RandomStep=function(Row, Col, DF, Direction=NULL){
   N=Row-1
@@ -179,8 +179,8 @@ MazeGen=function(MazeSize, FilledPercent, ShuffleNum, PercentTolerance, verbose=
   }
   return(Maze)
 }
-# 
-# # MazePlot
+
+# MazePlot
 # Maze=MazeGen(MazeSize=10, FilledPercent=50, ShuffleNum=50, PercentTolerance=1000)
 # 
 # #Default parameters
