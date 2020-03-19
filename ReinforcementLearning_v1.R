@@ -10,7 +10,7 @@ setwd(gsub(pattern='Documents', replacement='Google Drive/Github/MazeAI/', x=get
 source(file='MazeGenerator_v6.R')
 
 #Set Parameters
-SizeOfMaze=25
+SizeOfMaze=50
 PercentFill=50
 
 #Default first user step

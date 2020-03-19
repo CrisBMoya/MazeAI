@@ -179,9 +179,9 @@ MazeGen=function(MazeSize, FilledPercent, ShuffleNum, PercentTolerance, verbose=
   }
   return(Maze)
 }
-
-# MazePlot
-# Maze=MazeGen(MazeSize=10, FilledPercent=50, ShuffleNum=50, PercentTolerance=1000)
+# 
+# #MazePlot
+# Maze=MazeGen(MazeSize=50, FilledPercent=50, ShuffleNum=50, PercentTolerance=1000)
 # 
 # #Default parameters
 # PointsLabel=1
